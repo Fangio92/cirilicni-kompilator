@@ -2,7 +2,7 @@ PROG = parser
 CC = g++
 LEX = flex
 YACC = bison
-CFLAGS = -Wall -std=c++11
+CFLAGS = -Wall -std=c++11 -Wno-sign-compare
 
 $(PROG): parser.tab.o lex.yy.o
 	$(CC) $(CFLAGS) -o $@ $^

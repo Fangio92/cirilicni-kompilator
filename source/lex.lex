@@ -21,13 +21,13 @@ ID      [љњертзуиопшђасдфгхјклчћжжџцвбнмЉЊЕР�
 
 {ID}                         { std::cout<<yytext; return ID; }
 [0-9]+                       { std::cout<<yytext; return NUM; }
-[<>,+/*():=!$|'-\[\]{}]       { std::cout<<yytext; return *yytext;}
+[<>,+/*():=!$|'-\[\]{}]      { std::cout<<yytext; return *yytext;}
 
-[ \t\n]          { ECHO;  }
-.                {
-                   std::cerr<<"Leksicka greska: Neprepoznat karakter"<<yytext<<std::endl;
-                    exit(EXIT_FAILURE);
-                 }
+[ \t\n]                      { ECHO;  }
+.                            {
+                               std::cerr<<"Leksicka greska: Neprepoznat karakter"<<yytext<<std::endl;
+                               exit(EXIT_FAILURE);
+                             }
 
 %%
 
