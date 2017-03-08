@@ -27,3 +27,9 @@
 *.exe
 *.out
 *.app
+
+lex.yy.c
+parser
+parser.output
+parser.tab.cpp
+parser.tab.hpp

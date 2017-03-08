@@ -1,0 +1,82 @@
+
+%{
+#include<iostream>
+#define YYDEBUG 1
+
+void yyerror(const char *str) {
+    extern int yylineno;
+
+    std::cerr<<"Pojavila se greska: "<< str<<"  u liniji: "<< yylineno<<std::endl;
+    exit(EXIT_FAILURE);
+} 
+
+int yylex();
+
+%}
+%token ID NUM CEO AKO ONDA VRATI
+
+
+%start S
+%%
+S: niz_funkcija ;
+
+niz_funkcija: niz_funkcija funkcija
+            |
+            ;
+            
+funkcija: tip ID lista_argumenata blok;
+
+blok: '{' niz_naredbi '}'
+        | '{''}'
+    ;
+
+lista_argumenata: '(' niz_argumenata ')'
+                ;
+                
+lista_promenljivih: '(' niz_brojeva ')'
+                ;
+
+
+niz_argumenata: niz_argumenata ',' tip ID 
+                |  tip ID
+                | 
+                ;
+
+niz_naredbi: niz_naredbi naredba 
+            | naredba 
+            ;
+            
+naredba: ID '=' NUM ';'
+        | VRATI broj ';'
+        | ID lista_promenljivih ';'
+        | uslov 
+        
+        ;
+
+
+uslov: AKO '(' upit ')' ONDA blok
+        ;
+upit: broj '<' broj
+    | broj '>' broj
+    | broj '>''=' broj
+    | broj '<''=' broj
+    ;
+        
+tip: CEO;
+
+niz_brojeva: broj
+            | niz_brojeva ',' broj 
+            |
+            ;
+
+broj: ID
+    | NUM
+    ;
+
+%%
+
+/* Main funkcija */
+int main() {
+yydebug=1;
+  return yyparse();
+}
