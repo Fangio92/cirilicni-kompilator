@@ -1,7 +1,17 @@
 
 %{
-#include<iostream>
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <string>
+#include <map>
+#include <vector>
+#include "classes/naredba.hpp"
+
 #define YYDEBUG 1
+
+std::map <std::string, int> id_map;
+
 
 void yyerror(const char *str) {
     extern int yylineno;
@@ -10,10 +20,29 @@ void yyerror(const char *str) {
     exit(EXIT_FAILURE);
 } 
 
+map<std::string, int> tablica;
+
 int yylex();
 
 %}
-%token ID NUM CEO AKO ONDA VRATI INACE
+%union{
+    std::string *s;
+    int x;
+    Naredba *n;
+    Izraz *i;
+    vector<Naredba*> *v;
+}
+
+%token  CEO VRATI STAMPAJ
+
+%token<s> ID
+%token<x> NUM
+%token<bul> AKO ONDA INACE
+
+%type <i> E
+
+%type <n> naredba blok uslov dodela
+%type <v> niz_naredbi
 
 
 %start S
@@ -21,93 +50,66 @@ int yylex();
 
 %right '='
 
+%left '<''>' 
 %left '+' '-'
 %left '*' '/'
 %left UMINUS 
 
-%nonassoc AKO
+%nonassoc AKO ONDA
 %nonassoc INACE
 
 %%
-S: niz_funkcija ;
+S: ID '(' ')' blok                          { $4 -> izvrsi();  delete $4; }
+    ;
 
-niz_funkcija:   niz_funkcija funkcija
-                |
+blok:           '{' niz_naredbi ';''}'      { $$ = new Blok(*$2);  delete $2; }
+                ;
+
+
+niz_naredbi:    niz_naredbi ';' naredba     { $$ = $1;  $$->push_back($3); }
+                | naredba                   { $$ = new vector<Naredba*>();  $$->push_back($1); }
                 ;
             
-funkcija:       tip ID lista_argumenata blok;
-
-blok:           '{' niz_naredbi '}'
-                | '{''}'
+naredba:        dodela                      { $$=$1; }
+                | uslov                     { $$=$1; }
+                | STAMPAJ '(' E ')'         { $$ = new IspisIzraza($3);  delete $3; }
+                | blok                      { $$ = $1; }
+                | deklaracija_var
                 ;
-
-lista_argumenata: '(' niz_argumenata ')'
+dodela:         ID '=' E                    { $$ = new Dodela(*$1, $3);  delete $1;  delete $3;}
                 ;
-                
-lista_promenljivih: '(' niz_brojeva ')'
+deklaracija_var: CEO lista_id
                 ;
-
-
-niz_argumenata: niz_argumenata ',' tip ID 
-                |  tip ID
-                | 
-                ;
-
-niz_naredbi:    niz_naredbi naredba 
-                | naredba 
-                ;
-            
-naredba:        dodela ';'
-                | VRATI E ';'
-                | ID lista_promenljivih ';'
-                | uslov 
-                | tip lista_inicijalizacije ';'
-                ;
-lista_inicijalizacije: lista_inicijalizacije ',' dodela
-                | lista_inicijalizacije ','  ID
+lista_id:       lista_id ',' ID
                 | ID
-                | dodela
-                |
                 ;
+uslov:          AKO '(' E ')' ONDA blok                  { $$ = new AkoJeOnda($3, $6);  delete $3; }
+                | AKO '(' E ')' ONDA blok INACE blok     { $$ = new AkoJeOndaInace($3, $6, $8);  delete $3; }
+                ;
+              
         
-dodela:         ID '=' E
-                ;
-        
-uslov:          AKO '(' upit ')' ONDA blok
-                | AKO '(' upit ')' ONDA blok INACE blok
-                ;
-                
-upit:           E '<' E
-                | E '>' E
-                | E '>''=' E
-                | E '<''=' E
-                ;
-        
-E :             E '+' E	{ $$ = $1 + $3; }
-                | E '-' E	{ $$ = $1 - $3; }
-                | E '*' E	{ $$ = $1 * $3; }
-                | E '/' E	{ }
-                | '(' E ')'	{ $$ = $2; }
-                | '-' E    %prec UMINUS	{ $$ = -$2; }
-                | NUM		{ $$ = $1; }
-                | ID		
+E :             E '+' E	                {  $$= new Zbir($1,$3); delete $1; delete $3;    }
+                | E '-' E	            {  $$= new Razlika($1,$3); delete $1; delete $3; }
+                | E '*' E           	{  $$= new Proizvod($1,$3); delete $1; delete $3;}
+                | E '/' E	            {  $$= new Kolicnik($1,$3); delete $1; delete $3;}
+                | '(' E ')'	            {  $$ = $2; }
+                | '-' E    %prec UMINUS	{ /*TODO*/ }
+                | NUM		            {  $$ = new Konstanta($1); }
+                | ID                    {  $$ = new Promenljiva(*$1); delete $1;}
+                | E '<' E               {  $$ = new Manje($1, $3);  delete $1;  delete $3; }
+                | E '>' E               {  $$ = new Vece($1, $3);  delete $1;  delete $3;}
+                | E '>''=' E            { /*TODO*/ }
+                | E '<''=' E            { /*TODO*/ }
                 ;
         
         
-tip:            CEO
-                |
-                ;
 
-niz_brojeva:    E
-                | niz_brojeva ',' E 
-                |
-                ;
 
 
 %%
 
 /* Main funkcija */
 int main() {
-yydebug=0;
+  yydebug=0;
   return yyparse();
 }
