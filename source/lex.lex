@@ -31,7 +31,6 @@ ID      [љњертзуиопшђасдфгхјклчћжжџцвбнмЉЊЕР�
 онда                         { ISPIS; return ONDA; }
 врати                        { ISPIS; return VRATI; }
 иначе                        { ISPIS; return INACE; }
-штампај                      { ISPIS; return STAMPAJ; }
 
 {ID}                         { ISPIS;   yylval.s = new string(yytext);
                                         smanji_slova(*(yylval.s));

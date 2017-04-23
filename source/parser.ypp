@@ -33,83 +33,76 @@ int yylex();
     vector<Naredba*> *v;
 }
 
-%token  CEO VRATI STAMPAJ
+%token  CEO VRATI 
 
 %token<s> ID
 %token<x> NUM
 %token<bul> AKO ONDA INACE
 
-%type <i> E
-
-%type <n> naredba blok uslov dodela
-%type <v> niz_naredbi
-
-
 %start S
 
 
-%right '='
+%nonassoc '='
 
 %left '<''>' 
 %left '+' '-'
 %left '*' '/'
 %left UMINUS 
 
-%nonassoc AKO ONDA
+%nonassoc ONDA
 %nonassoc INACE
 
 %%
-S: ID '(' ')' blok                          { $4 -> izvrsi();  delete $4; }
+S:   S funkcija 
+    | funkcija
     ;
 
-blok:           '{' niz_naredbi ';''}'      { $$ = new Blok(*$2);  delete $2; }
+funkcija: ID '(' argumenti ')' blok
+        ;
+        
+blok:           '{' niz_naredbi   '}'      {  }
                 ;
 
 
-niz_naredbi:    niz_naredbi ';' naredba     { $$ = $1;  $$->push_back($3); }
-                | naredba                   { $$ = new vector<Naredba*>();  $$->push_back($1); }
+niz_naredbi:    niz_naredbi ';' naredba    {  }
+                | naredba                   {  }
                 ;
             
-naredba:        dodela                      { $$=$1; }
-                | uslov                     { $$=$1; }
-                | STAMPAJ '(' E ')'         { $$ = new IspisIzraza($3);  delete $3; }
-                | blok                      { $$ = $1; }
-                | deklaracija_var
+naredba:        ID '=' E                      {  }
+                | blok                      {  }
+                | uslov
+                | poziv_funkcije
+                |
                 ;
-dodela:         ID '=' E                    { $$ = new Dodela(*$1, $3);  delete $1;  delete $3;}
-                ;
-deklaracija_var: CEO lista_id
-                ;
-lista_id:       lista_id ',' ID
-                | ID
-                ;
-uslov:          AKO '(' E ')' ONDA blok                  { $$ = new AkoJeOnda($3, $6);  delete $3; }
-                | AKO '(' E ')' ONDA blok INACE blok     { $$ = new AkoJeOndaInace($3, $6, $8);  delete $3; }
-                ;
-              
+uslov:    AKO E ONDA naredba
+        | AKO E ONDA naredba INACE naredba
+        ;
         
-E :             E '+' E	                {  $$= new Zbir($1,$3); delete $1; delete $3;    }
-                | E '-' E	            {  $$= new Razlika($1,$3); delete $1; delete $3; }
-                | E '*' E           	{  $$= new Proizvod($1,$3); delete $1; delete $3;}
-                | E '/' E	            {  $$= new Kolicnik($1,$3); delete $1; delete $3;}
-                | '(' E ')'	            {  $$ = $2; }
-                | '-' E    %prec UMINUS	{ /*TODO*/ }
-                | NUM		            {  $$ = new Konstanta($1); }
-                | ID                    {  $$ = new Promenljiva(*$1); delete $1;}
-                | E '<' E               {  $$ = new Manje($1, $3);  delete $1;  delete $3; }
-                | E '>' E               {  $$ = new Vece($1, $3);  delete $1;  delete $3;}
-                | E '>''=' E            { /*TODO*/ }
-                | E '<''=' E            { /*TODO*/ }
+poziv_funkcije: ID '(' argumenti  ')'
+                ;
+E :               E '+' E	                {     }
+                | E '-' E	            {   }
+                | E '*' E           	{  }
+                | E '/' E	            {  }
+                | '(' E ')'	            {   }
+                | '-' E    %prec UMINUS	{  }
+                | NUM		            {   }
+                | ID                    {  }
+                | E '<' E               {   }
+                | E '>' E               {  }
+                | E '>''=' E            {  }
+                | E '<''=' E            {  }
                 ;
         
-        
-
-
+argumenti: argumenti ','  E
+        | E
+        |
+        ;
 
 %%
 
 /* Main funkcija */
 int main() {
-  yydebug=0;
+  yydebug=1;
   return yyparse();
 }
