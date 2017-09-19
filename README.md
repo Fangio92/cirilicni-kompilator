@@ -25,7 +25,7 @@ Prvi ćirilični kompilator
 
 -Definisanje eksternih funkcija
 
-extern double sin(double x);
+    extern double sin(double x);
 
 -if then else, if then
 
@@ -46,3 +46,4 @@ extern double sin(double x);
         };
     
 Pored ovih podrzane su racunske operacije, poredjenje < i >. **Poslednja naredba je i povratna vrednost funkcije**
+
