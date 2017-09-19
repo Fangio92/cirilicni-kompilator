@@ -19,9 +19,9 @@ Prvi ćirilični kompilator
 
 -Pisanje funkcija
 
-@double stepen(double e, int n){
-
-}
+    @double stepen(double e, int n){
+    
+    }
 
 -Definisanje eksternih funkcija
 
