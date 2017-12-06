@@ -14,36 +14,40 @@ Prvi ćirilični kompilator
 -Dva brojevna tipa, double i int
    
 
-     int c;
-     double d;
+     цео ц;
+     дупли д;
 
 -Pisanje funkcija
 
-    @double stepen(double e, int n){
+    @дупли степен(дупли е, цео н){
     
     }
 
--Definisanje eksternih funkcija
-
-    extern double sin(double x);
 
 -if then else, if then
 
-    if a<2{
+    ако а<2{
         1;
     }
-    else{
-        fib(a-1)+fib(a-2);
+    иначе{
+        фиб(а-1)+фиб(а-2);
     };
     
-    if (a<2) { 1; }
+    ако (а<2) { 1; }
 -while petlja
    
 
-     while a<n{
-            a=a+1;
-            d=d*e;
+     док а<н{
+            а=а+1;
+            д=д*е;
         };
     
 Pored ovih podrzane su racunske operacije, poredjenje < i >. **Poslednja naredba je i povratna vrednost funkcije**
+
+Komande za kompilaciju test primera:
+
+    make
+    ./cirko --compile primer.txt
+    clang output.o main.c
+    ./a.out
 

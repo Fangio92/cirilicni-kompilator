@@ -28,16 +28,16 @@ ID      [љњертзуиопшђасдфгхјклчћжжџцвбнмЉЊЕР�
 
 %%
 
-int                           {ISPIS; return int_token; }
-double                        {ISPIS; return double_token; }
-if                            {ISPIS; return if_token; }
-else                          {ISPIS; return else_token; }
-while                         {ISPIS; return while_token; }
-print                         {ISPIS; return print_token; }
-extern                        {ISPIS; return extern_token; }
+цео                           {ISPIS; return int_token; }
+дупли                        {ISPIS; return double_token; }
+ако                            {ISPIS; return if_token; }
+иначе                          {ISPIS; return else_token; }
+док                         {ISPIS; return while_token; }
+штампај                         {ISPIS; return print_token; }
+спољни                        {ISPIS; return extern_token; }
 
 
-[a-zA-Z_][a-zA-Z0-9_]*        {ISPIS;   yylval.s = new string(yytext);
+{ID}*        {ISPIS;   yylval.s = new string(yytext);
                                         smanji_slova(*(yylval.s));
                                         return id_token; }
 #.*                           {ISPIS; }                                        
